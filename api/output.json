@@ -1,0 +1,60 @@
+{
+  "issues": [
+    {
+      "issue": "Hardcoded sensitive credentials",
+      "severity": "Critical",
+      "location": "line 17 - args: [\"-dbhost\", \"orionld-mongodb-svc:27017\",\"-rplSet\",\"orionld-mongodb\",\"-dbuser\",\"usuarioz\u00e3o\",\"-dbpwd\",\"123456789\",\"-dbAuthMech\",\"SCRAM-SHA-256\",\"-db\",\"orion\",\"-statCounters\", \"-statSemWait\", \"-statTiming\", \"-statNotifQueue\"]",
+      "description": "The deployment contains hardcoded database credentials (username and password) in plain text. This is a severe security risk as it exposes sensitive information.",
+      "standard": "CIS Kubernetes Benchmark v1.8 - 5.2.1",
+      "link": "https://www.cisecurity.org/benchmark/kubernetes/",
+      "recommendation": "Use Kubernetes Secrets to store sensitive credentials and reference them via environment variables or volumes."
+    },
+    {
+      "issue": "Service exposes unnecessary LoadBalancer",
+      "severity": "High",
+      "location": "line 38 - type: LoadBalancer",
+      "description": "The service is configured as a LoadBalancer, which exposes it to the public internet by default. This may not be necessary and increases the attack surface.",
+      "standard": "Kubernetes Network Policies Best Practices",
+      "link": "https://kubernetes.io/docs/concepts/services-networking/network-policies/",
+      "recommendation": "Use ClusterIP if external access isn't required, or implement Network Policies to restrict access."
+    },
+    {
+      "issue": "Mismatched service ports",
+      "severity": "Medium",
+      "location": "line 40 - port: 1027, targetPort: 1026",
+      "description": "The service exposes port 1027 but targets port 1026 on the container. This inconsistency could cause confusion and potential connectivity issues.",
+      "standard": "Kubernetes Service Documentation",
+      "link": "https://kubernetes.io/docs/concepts/services-networking/service/",
+      "recommendation": "Consider using the same port number (1026) for both service port and targetPort unless there's a specific reason for the mismatch."
+    },
+    {
+      "issue": "No security context defined",
+      "severity": "Medium",
+      "location": "line 10 - spec:",
+      "description": "The pod specification doesn't include a security context, which means it runs with default privileges. This could allow potential privilege escalation.",
+      "standard": "CIS Kubernetes Benchmark v1.8 - 5.7.1",
+      "link": "https://www.cisecurity.org/benchmark/kubernetes/",
+      "recommendation": "Add a security context with non-root user, read-only root filesystem, and dropped capabilities."
+    },
+    {
+      "issue": "No pod disruption budget",
+      "severity": "Low",
+      "location": "Entire deployment",
+      "description": "The deployment doesn't have a PodDisruptionBudget defined, which could lead to availability issues during voluntary disruptions.",
+      "standard": "Kubernetes Best Practices",
+      "link": "https://kubernetes.io/docs/tasks/run-application/configure-pdb/",
+      "recommendation": "Add a PodDisruptionBudget to ensure minimum availability during maintenance operations."
+    },
+    {
+      "issue": "No resource limits for HPA memory metric",
+      "severity": "Low",
+      "location": "line 56 - memory target: 70% utilization",
+      "description": "The HorizontalPodAutoscaler is configured to scale based on memory utilization, but the memory limit is set quite low (500Mi). This could lead to frequent scaling events.",
+      "standard": "Kubernetes Autoscaling Best Practices",
+      "link": "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/",
+      "recommendation": "Consider adjusting memory limits or utilization targets to prevent unnecessary scaling."
+    }
+  ],
+  "score": 65,
+  "scoreCriteria": "Score calculated starting from 100. Deductions: -30 for Critical issue, -20 for High issue, -10 for each Medium issue (total -20), -5 for each Low issue (total -10). Additional -5 penalty for multiple security-related issues."
+}
