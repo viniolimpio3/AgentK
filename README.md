@@ -47,14 +47,12 @@ pip install -r requirements.txt
 ## ▶️ Como Executar
 
 ```bash
-uvicorn main:app --reload
-Acesse: http://127.0.0.1:8000
 
-Swagger: http://127.0.0.1:8000/docs [ToDO]
-```
+cd api
+docker-compose build
 
-```bash
-uvicorn main:app --reload
+docker-compose up -d
+
 Acesse: http://127.0.0.1:8000
 
 Swagger: http://127.0.0.1:8000/docs [ToDO]

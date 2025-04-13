@@ -1,0 +1,14 @@
+[Unit]
+Description=AgentK - Monitoramento de arquivos de configuração do Kubernetes
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/caminho/para/seu/projeto/run_scheduler.sh
+WorkingDirectory=/caminho/para/seu/projeto
+Restart=always
+User=seu_usuario_linux
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target

@@ -8,3 +8,9 @@ from datetime import datetime
 # filename = f"output-{current_datetime}.json"
 # with open("output.json", "w") as json_file:
 #     json.dump(result, json_file, indent=2)
+
+
+from src.scheduler import start_scheduler
+
+if __name__ == '__main__':
+    start_scheduler()
