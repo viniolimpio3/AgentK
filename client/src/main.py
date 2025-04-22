@@ -1,16 +1,19 @@
-from datetime import datetime
-# ToDO: adicionar uma requisição http para o servidor
-# result = analyze_kubernetes_yaml(readFile("../example.yaml"))
-# result = result.strip('`').strip().removeprefix('json').strip()
-# result = json.loads(result)
+import requests
+import os
 
-# current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M")
-# filename = f"output-{current_datetime}.json"
-# with open("output.json", "w") as json_file:
-#     json.dump(result, json_file, indent=2)
+from utils.files import get_k8s_yamls_merged, make_yaml_file, save_corrected_yaml
+from services.api_k.api_k_requests import analyze
 
-
-from src.scheduler import start_scheduler
+from dotenv import load_dotenv
+load_dotenv()
 
 if __name__ == '__main__':
-    start_scheduler()
+    try: 
+        file = get_k8s_yamls_merged() # Busca os arquivos YAML mesclado em um único arquivo
+        response = analyze(file) # Envia o arquivo para a API do AgentK realizar a análise
+        print(response['result'])
+        print(type(response['result']))
+        ai_response = response['result']['choices'][0]['message']['content']
+        save_corrected_yaml(ai_response['correctedFile']) # Salva o arquivo corrigido no mesmo diretório dos arquivos originais
+    except Exception as e:
+        print(f"Error: {e} {e.__traceback__}")

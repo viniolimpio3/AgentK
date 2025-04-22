@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: agentk-scheduler
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: scheduler
+            image: agent-k/client:v1
+            command: ["python", "src/main.py"]
+            volumeMounts:
+              - name: agent-k
+                mountPath: /app/
+          restartPolicy: Never
+          volumes: 
+          - name: agent-k
+            hostPath:
+              path: /run/desktop/mnt/host/c/Users/vinio/facul/AgentK/client
+              type: Directory

@@ -1,10 +1,10 @@
-version: '3.8'
 services:
   api-agentk:
     container_name: api-agentk
     build:
       context: .
       dockerfile: Dockerfile
+    image: agent-k/api-agent-k:v1
     environment: 
       - API_KEY_OPENAI=${API_KEY_OPENAI}
       - BASE_URL_OPENAI=${BASE_URL_OPENAI}

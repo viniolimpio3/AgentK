@@ -45,8 +45,12 @@
         },
         "scoreCriteria": {
             "type": "string",
-            "description": "Calculated by deducting points based on the number of issues found on array 'issues', and their severity: -5 for Low, -7 for Medium, -10 for High, -20 for Critical issues. Score starts at 100. Additional penalties applied if best practices or security standards (e.g., CIS) are violated."
+            "description": "Calculated by deducting points based on the number of issues found on array 'issues', and their severity: -5 for Low, -10 for Medium, -15 for High, -25 for Critical issues. Score starts at 100. Additional penalties applied if best practices or security standards (e.g., CIS) are violated."
+        },
+        "correctedFile": {
+            "type": "string",
+            "description": "The corrected YAML file after applying the recommendations"
         }
     },
-    "required": ["score", "scoreCriteria", "issues"]
+    "required": ["score", "scoreCriteria", "issues", "correctedFile"]
 }
