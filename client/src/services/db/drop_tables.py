@@ -1,4 +1,3 @@
-
 from src.services.db.database import connect
 
 def drop_tables():

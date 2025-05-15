@@ -21,4 +21,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Comando padrão ao iniciar o container
-CMD ["python", "./src/main.py"]
+# CMD ["python",, "-m", "src.main"]
+CMD ["/app/entrypoint.sh"]

@@ -11,13 +11,20 @@ spec:
           containers:
           - name: scheduler
             image: agent-k/client:v1
-            command: ["python", "src/main.py"]
+            # command: ["python", "-m", "src.main"]
+            command: ["/app/entrypoint.sh"]
             volumeMounts:
               - name: agent-k
                 mountPath: /app/
+              - name: yaml-files
+                mountPath: /app/test_samples
           restartPolicy: Never
           volumes: 
           - name: agent-k
             hostPath:
               path: /run/desktop/mnt/host/c/Users/vinio/facul/AgentK/client
+              type: Directory
+          - name: yaml-files
+            hostPath:
+              path: /run/desktop/mnt/host/c/Users/vinio/facul/test_samples
               type: Directory

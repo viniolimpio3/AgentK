@@ -1,6 +1,5 @@
 from datetime import datetime
-from src.utils.util import build_where_clause
-from services.db.database import connect
+from src.services.db.database import connect
 
 def create_tables():
     """
@@ -17,7 +16,7 @@ def create_tables():
         llm_response       TEXT,               -- JSON puro
         llm_input_tokens   INTEGER,
         llm_output_tokens  INTEGER,
-        llm_time_duration  TEXT                -- ISO 8601 (duração)
+        llm_response_time_duration  INTEGER    -- Duração em segundos
     );
     CREATE INDEX IF NOT EXISTS idx_history_filename
         ON llm_response_history(filename);
