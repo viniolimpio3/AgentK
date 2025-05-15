@@ -14,12 +14,16 @@ spec:
     spec:
       containers:
         - name: meu-container
-          image: nginx:1.25.3
+          image: nginx:1.23.4
           ports:
             - containerPort: 80
           securityContext:
-            runAsUser: 101
-            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
 ---
 apiVersion: v1
 kind: Service
