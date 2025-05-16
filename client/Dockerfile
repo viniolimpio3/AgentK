@@ -1,4 +1,4 @@
-FROM python:3.13.3-alpine
+FROM python:3.10.4-alpine
 
 # Instalar dependências do sistema necessárias para o sqlite3 funcionar
 RUN apk add --no-cache \

@@ -54,14 +54,16 @@ def get_k8s_yamls_merged():
         k8s_yaml_merged = ""
         for file in k8s_files:
             content = get_file_content(file['path'])
-            k8s_yaml_merged += content + "\n---\n# File: "+ file['filename'] + "\n"
+            k8s_yaml_merged += "# File: "+ file['filename'] + "\n" + content + "\n---\n"
 
         file = make_yaml_file("k8s_merged.yaml", k8s_yaml_merged)
-        logger.info(f"Arquivo mesclado criado com sucesso. Conteúdo: {k8s_yaml_merged}")
+        conteudo = k8s_yaml_merged.replace('\n', ' ')
+        logger.info(f"Arquivo mesclado criado com sucesso. Conteúdo: {conteudo}")
 
         return file
     except FileNotFoundError as e:
         logger.info(e)
+        raise FileNotFoundError(e)
     except Exception as e:
         logger.error(f"Erro ao mesclar arquivos YAML: {e}")
         raise Exception(f"Erro ao mesclar arquivos YAML: {e}")
