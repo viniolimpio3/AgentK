@@ -1,13 +1,20 @@
 # 🛡️ AgentK
 
-Este projeto é uma API desenvolvida com FastAPI que permite o upload de arquivos YAML (.yaml ou .yml), realizando validações de:
+Este projeto é composto por dois componentes principais:
+
+1. **API**: Desenvolvida com FastAPI que realiza análise de arquivos YAML (.yaml ou .yml)
+2. **Client**: CronJob que monitora diretórios e envia arquivos YAML para análise
+
+## Validações Realizadas
 
 - ✅ Tipo MIME e extensão do arquivo
-- ✅ Validação com Large Language Model a estrutura e conteúdo YAML
+- ✅ Validação com Large Language Model da estrutura e conteúdo YAML
+- ✅ Análise de boas práticas nos manifestos Kubernetes
+- ✅ Score de qualidade da configuração
 
 ---
 
-## 📸 AgentK - API
+## 📸 AgentK
 
 <p align="center">
   <img src="docs/AgentK-color.png" alt="AgentK" width="500" />
@@ -17,106 +24,111 @@ Este projeto é uma API desenvolvida com FastAPI que permite o upload de arquivo
 
 ## 🚀 Bibliotecas Utilizadas
 
+### API
 - Python 3.10
 - FastAPI 
 - Uvicorn
-- PyYAML
+- Python-multipart
+- OpenAI
+
+### Client
+- Python 3.10
+- SQLite3
+- Requests
+- Python-dotenv
 
 ---
 
 ## 📦 Requisitos
 
 - Python 3.9 ou superior
+- Docker e Docker Compose
+- Kubernetes cluster local (para o Client)
 - pip (gerenciador de pacotes do Python)
 
 ---
 
-## ⚙️ Instalação - API K
+## ⚙️ Instalação e Execução
+
+### API K
 
 ```bash
+# Clone o repositório
 git clone https://github.com/viniolimpio3/AgentK.git
 cd AgentK/api
 
-# Instale as dependências
-pip install -r requirements.txt
+# Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o arquivo .env com suas credenciais
 
-
-```
-
-
-## ▶️ Como Executar
-
-```bash
-
-cd api
+# Build e execução com Docker Compose
 docker-compose build
-
 docker-compose up -d
 
-Acesse: http://127.0.0.1:8000
-
-Swagger: http://127.0.0.1:8000/docs [ToDO]
+# A API estará disponível em:
+# http://localhost:8000
+# Swagger: http://localhost:8000/docs
 ```
 
-### Analisar seu YAML:
+### Client (CronJob)
 
-- Enviar o arquivo como multipart/form-data no campo file.
-- Executar o cURL abaixo
 ```bash
-curl -X POST "http://localhost:8000/api/analyze" -F "file=@exemplo.yaml"
+cd AgentK/client
+
+# Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o arquivo .env com suas configurações
+
+# Build da imagem Docker
+docker build -t agent-k/client:v1 .
+
+# Aplique o CronJob no cluster
+kubectl apply -f agentk-cronjob.yaml
+
+# Para reiniciar o CronJob (útil durante desenvolvimento)
+./reset-img-build-cronjob.sh
 ```
 
-✅ Retorno Esperado
+## 📝 Uso da API
 
-Se o upload e a validação forem bem-sucedidos, o retorno será semelhante a:
+### Analisar arquivo YAML:
+
+```bash
+curl -X POST "http://localhost:8000/api/analyze" \
+     -H "Content-Type: multipart/form-data" \
+     -F "file=@exemplo.yaml"
+```
+
+### ✅ Retorno Esperado
 
 ```json
-    {
+{
     "status": 200,
     "message": "File analyzed successfully",
     "result": {
-        "id": "response ID",
-        "choices": [
+        "issues": [
             {
-                "finish_reason": "stop",
-                "index": 0,
-                "logprobs": null,
-                "message": {
-                    "content": {
-                        "issues": [
-                        ],
-                        "score": 65,
-                        "scoreCriteria": "Score calculated starting from 100. Deductions: -30 for Critical issue, -20 for High issue, -10 for each Medium issue (x2), -5 for each Low issue (x2). Additional penalty for security best practices violations."
-                    },
-                    "refusal": null,
-                    "role": "assistant",
-                    "annotations": null,
-                    "audio": null,
-                    "function_call": null,
-                    "tool_calls": null
-                }
+                "issue": "Título do problema",
+                "severity": "Critical|High|Medium|Low",
+                "location": "Localização no arquivo",
+                "description": "Descrição detalhada",
+                "recommendation": "Sugestão de correção"
             }
         ],
-        "created": 1743957036,
-        "model": "deepseek-reasoner",
-        "object": "chat.completion",
-        "service_tier": null,
-        "system_fingerprint": "fp_3d5141a69a_prod0225",
-        "usage": {
-            "completion_tokens": 1020,
-            "prompt_tokens": 1094,
-            "total_tokens": 2114,
-            "completion_tokens_details": null,
-            "prompt_tokens_details": {
-                "audio_tokens": null,
-                "cached_tokens": 1088
-            },
-            "prompt_cache_hit_tokens": 1088,
-            "prompt_cache_miss_tokens": 6
-        }
+        "score": 85,
+        "scoreCriteria": "Critérios de pontuação"
     }
 }
 ```
 
-## 📸 AgentK - Client
-## [TODO]
+## 🔄 Client (CronJob)
+
+O client executa as seguintes operações:
+
+1. Monitora diretórios configurados em busca de arquivos YAML
+2. Mescla múltiplos arquivos em um único YAML
+3. Envia para análise na API
+4. Armazena resultados em SQLite
+5. Salva arquivos corrigidos
+
+O CronJob é configurado para executar a cada 10 minutos por padrão.
