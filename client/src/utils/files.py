@@ -70,7 +70,9 @@ def get_k8s_yamls_merged():
     
 def save_corrected_yaml(content, filename):
     file = make_yaml_file(filename, content)
-    path = Path(folder) / filename
+    corrections_dir = Path(folder) / "corrections"
+    corrections_dir.mkdir(parents=True, exist_ok=True)
+    path = corrections_dir / filename
     with open(path, 'wb') as f:
         f.write(file.getbuffer())
     return path.resolve()

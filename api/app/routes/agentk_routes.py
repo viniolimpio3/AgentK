@@ -1,11 +1,14 @@
 import os
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Query
 from app.services import yaml_analyzer
 
 router = APIRouter()
 
 @router.post("/analyze")
-async def analyze_yaml(file: UploadFile = File(...)):
+async def analyze_yaml(
+    file: UploadFile = File(...),
+    model: str = Query(None)
+):
 
     valid_mime_types = ["application/x-yaml", "text/yaml"] 
     valid_extensions = [".yaml", ".yml"]
@@ -20,7 +23,7 @@ async def analyze_yaml(file: UploadFile = File(...)):
     content = await file.read()
     content = content.decode("utf-8")
 
-    result = yaml_analyzer.analyze(content)
+    result = yaml_analyzer.analyze(content, model)  # use model se desejar
     return {
         "status": 200,
         "message": "File analyzed successfully",

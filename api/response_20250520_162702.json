@@ -1,0 +1,84 @@
+{
+  "status": 200,
+  "message": "File analyzed successfully",
+  "result": {
+    "id": "chatcmpl-BZMtdJeMPeYBjx07890IHuDaq5ENf",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": {
+            "score": 45,
+            "scoreCriteria": "100 minus 25 (Critical) minus 10 (Medium) minus 10 (Medium) minus 5 (Low) minus 5 (Low) = 45",
+            "issues": [
+              {
+                "issue": "Hardcoded database credentials",
+                "severity": "Critical",
+                "location": "Deployment.spec.template.spec.containers[0].args",
+                "description": "Database username and password are passed directly as command-line arguments, exposing sensitive credentials in plain text and in process listings. This violates security best practices and increases the risk of credential leakage.",
+                "recommendation": "Store the database credentials in a Kubernetes Secret and reference them via environment variables or volume mounts. Remove them from args."
+              },
+              {
+                "issue": "Missing container securityContext",
+                "severity": "Medium",
+                "location": "Deployment.spec.template.spec.containers[0]",
+                "description": "No securityContext is defined for the container. Without constraints like runAsNonRoot, dropCapabilities, and readOnlyRootFilesystem, the container may run as root and have unnecessary privileges, increasing the attack surface.",
+                "recommendation": "Add a securityContext to the container, for example:\nsecurityContext:\n  runAsNonRoot: true\n  runAsUser: 1000\n  allowPrivilegeEscalation: false\n  readOnlyRootFilesystem: true\n  capabilities:\n    drop: [\"ALL\"]"
+              },
+              {
+                "issue": "Unpinned container image tag",
+                "severity": "Medium",
+                "location": "Deployment.spec.template.spec.containers[0].image",
+                "description": "The image is referenced without a specific tag, defaulting to :latest. This can lead to unpredictable deployments if the image is updated upstream.",
+                "recommendation": "Specify an explicit, immutable image tag (for example, fiware/orion-ld:2.3.0) to ensure consistent, repeatable deployments."
+              },
+              {
+                "issue": "Missing imagePullPolicy",
+                "severity": "Low",
+                "location": "Deployment.spec.template.spec.containers[0].imagePullPolicy",
+                "description": "No imagePullPolicy is defined. By default, :latest images are pulled every time, which may slow down restarts.",
+                "recommendation": "Add imagePullPolicy: IfNotPresent (or Always if you need always pull) to control when images are pulled."
+              },
+              {
+                "issue": "Missing probe timeout and failureThreshold",
+                "severity": "Low",
+                "location": "Deployment.spec.template.spec.containers[0].livenessProbe & readinessProbe",
+                "description": "Probes lack timeoutSeconds and failureThreshold settings. Without timeouts, slow responses can cause pods to be marked unhealthy prematurely or hang indefinitely.",
+                "recommendation": "Define timeoutSeconds (e.g., 2) and failureThreshold (e.g., 3) for both livenessProbe and readinessProbe."
+              }
+            ],
+            "correctedFile": "apiVersion: v1\nkind: Secret\nmetadata:\n  name: fiware-orionld-db-secret\ntype: Opaque\nstringData:\n  DB_USER: \"usuariozão\"\n  DB_PWD: \"123456789\"\n---\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: fiware-orionld\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: orionld\n  template:\n    metadata:\n      labels:\n        app: orionld\n    spec:\n      containers:\n      - name: orion\n        image: fiware/orion-ld:REPLACE_WITH_VERSION\n        imagePullPolicy: IfNotPresent\n        securityContext:\n          runAsNonRoot: true\n          runAsUser: 1000\n          allowPrivilegeEscalation: false\n          readOnlyRootFilesystem: true\n          capabilities:\n            drop: [\"ALL\"]\n        args:\n        - -dbhost\n        - orionld-mongodb-svc:27017\n        - -rplSet\n        - orionld-mongodb\n        - -dbuser\n        - \"$(DB_USER)\"\n        - -dbpwd\n        - \"$(DB_PWD)\"\n        - -dbAuthMech\n        - SCRAM-SHA-256\n        - -db\n        - orion\n        - -statCounters\n        - -statSemWait\n        - -statTiming\n        - -statNotifQueue\n        ports:\n        - containerPort: 1026\n        env:\n        - name: ORIONLD_MONGOCONLY\n          value: \"TRUE\"\n        - name: DB_USER\n          valueFrom:\n            secretKeyRef:\n              name: fiware-orionld-db-secret\n              key: DB_USER\n        - name: DB_PWD\n          valueFrom:\n            secretKeyRef:\n              name: fiware-orionld-db-secret\n              key: DB_PWD\n        livenessProbe:\n          httpGet:\n            path: /version\n            port: 1026\n          initialDelaySeconds: 10\n          periodSeconds: 5\n          timeoutSeconds: 2\n          failureThreshold: 3\n        readinessProbe:\n          httpGet:\n            path: /version\n            port: 1026\n          initialDelaySeconds: 5\n          periodSeconds: 5\n          timeoutSeconds: 2\n          failureThreshold: 3\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: fiware-orionld-service\nspec:\n  type: LoadBalancer\n  ports:\n    - protocol: TCP\n      port: 1027\n      targetPort: 1026\n  selector:\n    app: orionld\n---\napiVersion: autoscaling/v2\nkind: HorizontalPodAutoscaler\nmetadata:\n  name: fiware-orionld-hpa\nspec:\n  scaleTargetRef:\n    apiVersion: apps/v1\n    kind: Deployment\n    name: fiware-orionld\n  minReplicas: 3\n  maxReplicas: 15\n  metrics:\n  - type: Resource\n    resource:\n      name: cpu\n      target:\n        type: Utilization\n        averageUtilization: 30\n  - type: Resource\n    resource:\n      name: memory\n      target:\n        type: Utilization\n        averageUtilization: 70"
+          },
+          "refusal": null,
+          "role": "assistant",
+          "annotations": [],
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null
+        }
+      }
+    ],
+    "created": 1747769193,
+    "model": "o4-mini-2025-04-16",
+    "object": "chat.completion",
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 3249,
+      "prompt_tokens": 987,
+      "total_tokens": 4236,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1920,
+        "rejected_prediction_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      }
+    }
+  }
+}
