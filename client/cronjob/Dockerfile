@@ -1,4 +1,4 @@
-FROM python:3.10.4-alpine
+FROM python:3.13.3-alpine
 
 # Instalar dependências do sistema necessárias para o sqlite3 funcionar
 RUN apk add --no-cache \
@@ -16,10 +16,8 @@ COPY . .
 
 VOLUME ["/app"]
 
-# Instala as dependências
-RUN pip install --no-cache-dir -r requirements.txt
-
+# Instala os pacotes
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 # Comando padrão ao iniciar o container
-# CMD ["python",, "-m", "src.main"]
 CMD ["/app/entrypoint.sh"]

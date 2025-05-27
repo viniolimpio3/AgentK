@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.services.db.database import connect
+from app.services.db.database import connect
 
 def create_tables():
     """
@@ -13,6 +13,7 @@ def create_tables():
         filename           TEXT    NOT NULL,   -- caminho do arquivo original
         created_at         TEXT    NOT NULL,   -- ISO 8601
         llm_model          TEXT,
+        llm_input          TEXT,               -- YAML concatenado
         llm_response       TEXT,               -- JSON puro
         llm_input_tokens   INTEGER,
         llm_output_tokens  INTEGER,

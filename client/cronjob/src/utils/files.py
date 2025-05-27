@@ -60,7 +60,7 @@ def get_k8s_yamls_merged():
         conteudo = k8s_yaml_merged.replace('\n', ' ')
         logger.info(f"Arquivo mesclado criado com sucesso. Conteúdo: {conteudo}")
 
-        return file
+        return file, conteudo
     except FileNotFoundError as e:
         logger.info(e)
         raise FileNotFoundError(e)

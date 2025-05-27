@@ -1,0 +1,83 @@
+# -----------------------------------------------------------------------------
+# Deployment do client-api-k
+# -----------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-api-k
+  labels:
+    app: client-api-k
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-api-k
+  template:
+    metadata:
+      labels:
+        app: client-api-k
+    spec:
+      containers:
+        - name: client-api-k
+          image: agent-k/client-api-k:v1
+          ports:
+            - containerPort: 3333
+          volumeMounts:
+            - name: db-agentk
+              mountPath: /app/data/
+      volumes:
+        - name: db-agentk
+          hostPath:
+            path: /run/desktop/mnt/host/c/Users/vinio/facul/AgentK/client/cronjob/src/services/db/
+            type: Directory
+---
+# -----------------------------------------------------------------------------
+# Service para expor o client-api-k
+# -----------------------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-api-k
+  labels:
+    app: client-api-k
+spec:
+  type: LoadBalancer
+  selector:
+    app: client-api-k
+  ports:
+    - port: 3333
+      targetPort: 3333
+      protocol: TCP
+---
+# -----------------------------------------------------------------------------
+# CronJob para orquestrar o scheduler
+# -----------------------------------------------------------------------------
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: agentk-scheduler
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: scheduler
+              image: agent-k/client:v1
+              command: ["/app/entrypoint.sh"]
+              volumeMounts:
+                - name: agent-k
+                  mountPath: /app/
+                - name: yaml-files
+                  mountPath: /app/test_samples
+          restartPolicy: Never
+          volumes:
+            - name: agent-k
+              hostPath:
+                path: /run/desktop/mnt/host/c/Users/vinio/facul/AgentK/client/cronjob
+                type: Directory
+            - name: yaml-files
+              hostPath:
+                path: /run/desktop/mnt/host/c/Users/vinio/facul/test_samples
+                type: Directory

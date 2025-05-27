@@ -1,0 +1,56 @@
+{
+    "type": "object",
+    "properties": {
+        "issues": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "issue": {
+                        "type": "string",
+                        "description": "Give a title for the issue here"
+                    },
+                    "severity": {
+                        "type": "string",
+                        "enum": ["Low", "Medium", "High", "Critical"],
+                        "description": "Severity level of the issue"
+                    },
+                    "location": {
+                        "type": "string",
+                        "description": "Indicates where the issue was found and its content (e.g., line 12 - image: nginx)"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Provide a detailed description of the issue and its impact"
+                    },
+                    "standard": {
+                        "type": "string",
+                        "description": "If applicable, provide the standard that is violated (e.g., CIS benchmark) or the Kubernetes documentation that is not being followed"
+                    },
+                    "link": {
+                        "type": "string",
+                        "description": "If applicable, provide a link to the standard or documentation"
+                    },
+                    "recommendation": {
+                        "type": "string",
+                        "description": "Provide a fixed version of the issue"
+                    }
+                },
+                "required": ["issue", "severity", "location", "description", "recommendation"]
+            }
+        },
+        "score": {
+            "type": "integer",
+            "description": "From 0 to 100, gives an overall score of the Kubernetes YAML file"
+        },
+        "scoreCriteria": {
+            "type": "string",
+            "description": "Calculated by deducting points based on the number of issues found on array 'issues', and their severity: -5 for Low, -10 for Medium, -15 for High, -25 for Critical issues. Score starts at 100. Additional penalties applied if best practices or security standards (e.g., CIS) are violated."
+        },
+        "correctedFile": {
+            "type": "string",
+            "description": "The corrected YAML file after applying the recommendations"
+        }
+    },
+    "required": ["score", "scoreCriteria", "issues", "correctedFile"]
+}

@@ -14,7 +14,7 @@ if __name__ == '__main__':
     try:     
         # Busca os arquivos YAML mesclando-os em um único arquivo
         logger.info("Listando diretório...")
-        file = get_k8s_yamls_merged()
+        file, content = get_k8s_yamls_merged()
 
         # Envia o arquivo para a API do AgentK realizar a análise
         logger.info("Enviando arquivos para análise...")
@@ -30,6 +30,7 @@ if __name__ == '__main__':
             filename = corrected_filename,
             llm_model = response['result']['model'],
             llm_response_json = json.dumps(ai_response),
+            yaml_input = content,
             score = ai_response['score'],
             score_criteria = ai_response['scoreCriteria'],
             input_tokens = response['result']['usage']['prompt_tokens'], 

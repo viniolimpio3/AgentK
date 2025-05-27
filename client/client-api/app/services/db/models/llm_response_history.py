@@ -1,14 +1,14 @@
 from datetime import datetime
-from src.services.db.database import connect
-from src.utils.util import build_where_clause
-from src.utils.logger import logger
+from app.services.db.database import connect
+from app.utils.util import build_where_clause
+from app.utils.logger import logger
 
 def fetch_all():
     try:
         """
         Retorna todas as linhas de llm_response_history.
         """
-        sql = "SELECT * FROM llm_response_history;"
+        sql = "SELECT * FROM llm_response_history ORDER BY id DESC;"
         with connect() as conn:
             return conn.execute(sql).fetchall()
     except Exception as e:
@@ -32,6 +32,7 @@ def fetch_by(filters):
 def insert(
     filename: str,
     llm_model: str,
+    yaml_input: str,
     llm_response_json: str,
     score: int,
     score_criteria: str,
@@ -46,14 +47,15 @@ def insert(
         """
         sql = """
         INSERT INTO llm_response_history (
-            filename, created_at, llm_model, llm_response,
+            filename, created_at, llm_model, yaml_input, llm_response,
             score, score_criteria, llm_input_tokens, llm_output_tokens, llm_response_time_duration
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """
         params = (
             filename,
             datetime.utcnow().isoformat(),
             llm_model,
+            yaml_input,
             llm_response_json,
             score,
             score_criteria,
