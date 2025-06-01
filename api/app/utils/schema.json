@@ -8,32 +8,32 @@
                 "properties": {
                     "issue": {
                         "type": "string",
-                        "description": "Give a title for the issue here"
+                        "description": "A concise title summarizing the issue"
                     },
                     "severity": {
                         "type": "string",
                         "enum": ["Low", "Medium", "High", "Critical"],
-                        "description": "Severity level of the issue"
+                        "description": "Impact level of the issue on the Kubernetes manifest and runtime"
                     },
                     "location": {
                         "type": "string",
-                        "description": "Indicates where the issue was found and its content (e.g., line 12 - image: nginx)"
+                        "description": "Location in the YAML where the issue occurs, including line number and content snippet"
                     },
                     "description": {
                         "type": "string",
-                        "description": "Provide a detailed description of the issue and its impact"
+                        "description": "Detailed explanation of the issue and its operational impact"
                     },
                     "standard": {
                         "type": "string",
-                        "description": "If applicable, provide the standard that is violated (e.g., CIS benchmark) or the Kubernetes documentation that is not being followed"
+                        "description": "The relevant Kubernetes documentation or best practice guideline violated, if any"
                     },
                     "link": {
                         "type": "string",
-                        "description": "If applicable, provide a link to the standard or documentation"
+                        "description": "URL to the official documentation or guideline"
                     },
                     "recommendation": {
                         "type": "string",
-                        "description": "Provide a fixed version of the issue"
+                        "description": "Recommended fix or corrected configuration snippet"
                     }
                 },
                 "required": ["issue", "severity", "location", "description", "recommendation"]
@@ -41,15 +41,15 @@
         },
         "score": {
             "type": "integer",
-            "description": "From 0 to 100, gives an overall score of the Kubernetes YAML file"
+            "description": "Overall quality score of the manifest, from 0 to 100"
         },
         "scoreCriteria": {
             "type": "string",
-            "description": "Calculated by deducting points based on the number of issues found on array 'issues', and their severity: -5 for Low, -10 for Medium, -15 for High, -25 for Critical issues. Score starts at 100. Additional penalties applied if best practices or security standards (e.g., CIS) are violated."
+            "description": "Explanation of score calculation based on issues found and severity"
         },
         "correctedFile": {
             "type": "string",
-            "description": "The corrected YAML file after applying the recommendations"
+            "description": "The fully corrected Kubernetes YAML manifest after applying all recommendations"
         }
     },
     "required": ["score", "scoreCriteria", "issues", "correctedFile"]

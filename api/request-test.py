@@ -2,7 +2,7 @@ import requests
 import json
 from datetime import datetime
 
-url = "http://localhost:8000/api/analyze?model=gpt"
+url = "http://localhost:8000/api/analyze?model=deepseek"
 
 payload = {}
 files=[
@@ -10,7 +10,7 @@ files=[
 ]
 headers = {}
 
-response = requests.request("POST", url, headers=headers, data=payload, files=files)
+response = requests.request("POST", url, headers=headers, data=payload, files=files, timeout=600)
 
 # Salva a resposta em um arquivo JSON
 current_datetime = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -24,5 +24,4 @@ with open(filename, 'w', encoding='utf-8') as f:
         f.write(response.text)
 
 print(f"Response saved to {filename}")
-print(response.text)
-# print(response.json())
+print("Elapsed time:", response.elapsed.total_seconds(), "seconds")

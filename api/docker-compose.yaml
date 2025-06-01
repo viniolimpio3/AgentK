@@ -1,3 +1,22 @@
+# services:
+#   api-agentk:
+#     container_name: api-agentk
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     image: agent-k/api-agent-k:v1
+#     environment: 
+#       - API_KEY_OPENAI=${API_KEY_OPENAI}
+#       - BASE_URL_OPENAI=${BASE_URL_OPENAI}
+#     ports:
+#       - "8000:8000"
+#     volumes:
+#       - .:/app
+#       - ./logs:/app/logs
+#     command: uvicorn run:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 60000 --timeout-graceful-shutdown 60000
+
+version: '3.8'
+
 services:
   api-agentk:
     container_name: api-agentk
@@ -12,4 +31,4 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    command: uvicorn run:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 30 --timeout-graceful-shutdown 600
+      - ./logs:/app/logs

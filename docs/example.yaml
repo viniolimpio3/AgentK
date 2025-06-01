@@ -40,8 +40,7 @@ spec:
             path: /version
             port: 1026
           initialDelaySeconds: 5
-          periodSeconds: 5
-
+          periodSeconds: five
 ---
 apiVersion: v1
 kind: Service
