@@ -1,4 +1,5 @@
 import os
+import json
 from fastapi import APIRouter, UploadFile, File, HTTPException, Query
 
 from app.services.db.models import llm_response_history as llm
@@ -11,5 +12,7 @@ async def recomendation():
 
     return {
         "status": 200,
-        "result": result
+        "result": [
+            {**item, "llm_response": json.loads(item["llm_response"])} for item in result
+        ]
     }
